@@ -6,7 +6,6 @@ import math
 import queue
 import sys
 import typing
-import warnings
 from concurrent.futures import Future
 from types import GeneratorType
 from urllib.parse import unquote, urljoin
@@ -415,29 +414,6 @@ class TestClient(httpx.Client):
             ) as portal:
                 yield portal
 
-    def _choose_redirect_arg(
-        self,
-        follow_redirects: typing.Optional[bool],
-        allow_redirects: typing.Optional[bool],
-    ) -> typing.Union[bool, httpx._client.UseClientDefault]:
-        redirect: typing.Union[
-            bool, httpx._client.UseClientDefault
-        ] = httpx._client.USE_CLIENT_DEFAULT
-        if allow_redirects is not None:
-            message = (
-                "The `allow_redirects` argument is deprecated. "
-                "Use `follow_redirects` instead."
-            )
-            warnings.warn(message, DeprecationWarning)
-            redirect = allow_redirects
-        if follow_redirects is not None:
-            redirect = follow_redirects
-        elif allow_redirects is not None and follow_redirects is not None:
-            raise RuntimeError(  # pragma: no cover
-                "Cannot use both `allow_redirects` and `follow_redirects`."
-            )
-        return redirect
-
     def request(  # type: ignore[override]
         self,
         method: str,
@@ -453,15 +429,15 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
         url = self.base_url.join(url)
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().request(
             method,
             url,
@@ -473,7 +449,7 @@ class TestClient(httpx.Client):
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
@@ -488,21 +464,21 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().get(
             url,
             params=params,
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
@@ -517,21 +493,21 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().options(
             url,
             params=params,
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
@@ -546,21 +522,21 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().head(
             url,
             params=params,
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
@@ -579,14 +555,14 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().post(
             url,
             content=content,
@@ -597,7 +573,7 @@ class TestClient(httpx.Client):
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
@@ -616,14 +592,14 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().put(
             url,
             content=content,
@@ -634,7 +610,7 @@ class TestClient(httpx.Client):
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
@@ -653,14 +629,14 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().patch(
             url,
             content=content,
@@ -671,7 +647,7 @@ class TestClient(httpx.Client):
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
@@ -686,21 +662,21 @@ class TestClient(httpx.Client):
         auth: typing.Union[
             httpx._types.AuthTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: typing.Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx._client.USE_CLIENT_DEFAULT,
         timeout: typing.Union[
             httpx._client.TimeoutTypes, httpx._client.UseClientDefault
         ] = httpx._client.USE_CLIENT_DEFAULT,
         extensions: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> httpx.Response:
-        redirect = self._choose_redirect_arg(follow_redirects, allow_redirects)
         return super().delete(
             url,
             params=params,
             headers=headers,
             cookies=cookies,
             auth=auth,
-            follow_redirects=redirect,
+            follow_redirects=follow_redirects,
             timeout=timeout,
             extensions=extensions,
         )
